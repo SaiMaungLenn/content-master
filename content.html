@@ -262,8 +262,8 @@
 
         // API key will be provided by the runtime environment.
         const apiKey = "AIzaSyClNUGqY-nXZj5eh3DXeRB_-YrqfQ6pA3Y";
-        const TRANSLATION_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-        const IMAGE_GEN_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`; // Note: This URL remains for context, but the function logic below will prevent it from being called incorrectly.
+        const TRANSLATION_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        const IMAGE_GEN_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:generateImages?key=${apiKey}`;
 
         // Get DOM elements
         const navMenu = document.getElementById('nav-menu');
@@ -485,8 +485,8 @@
 
                 // Step 2: Generate the image using the translated English prompt
                 const imagePayload = {
-                    instances: { prompt: englishPrompt },
-                    parameters: { "sampleCount": 1 }
+                    prompt: englishPrompt,
+                    numberOfImages: 1,
                 };
                 
                 const imageResponse = await fetchWithExponentialBackoff(IMAGE_GEN_API_URL, {
@@ -497,8 +497,8 @@
                 
                 const imageResult = await imageResponse.json();
                 
-                if (imageResult.predictions && imageResult.predictions.length > 0 && imageResult.predictions[0].bytesBase64Encoded) {
-                    const base64Data = imageResult.predictions[0].bytesBase64Encoded;
+                if (imageResult.generatedImages && imageResult.generatedImages.length > 0 && imageResult.generatedImages[0].image && imageResult.generatedImages[0].image.imageBytes) {
+                    const base64Data = imageResult.generatedImages[0].image.imageBytes;
                     const imageUrl = `data:image/png;base64,${base64Data}`;
                     resultImage.src = imageUrl;
                     resultImage.classList.remove('hidden');
